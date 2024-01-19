@@ -1,0 +1,60 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+enum UserType {
+    Preduzetnik
+    Investitor
+}
+
+model User {
+    id       Int      @id @default(autoincrement())
+    name     String
+    email    String   @unique
+    phone    String
+    password String
+    type     UserType
+    photo    String   @default("default_user.png")
+
+    posted_businesses Business[] @relation("posted_business")
+    liked_businesses  Business[] @relation("liked_business")
+    saved_businesses  Business[] @relation("saved_business")
+}
+
+enum BusinessType {
+    Edukacija
+    Ekologija
+    Usluge
+    IT
+    Restoran
+    Turizam
+    Zdravlje
+    Drugo
+}
+
+enum BusinessLegalType {
+    DOO
+    AD
+    KO
+    OD
+}
+
+model Business {
+    id          Int               @id @default(autoincrement())
+    name        String
+    legal_type  BusinessLegalType
+    type        BusinessType
+    description String
+    photo       String            @default("default_business.png")
+
+    postedBy     User @relation(fields: [posted_by_id], references: [id], name: "posted_business")
+    posted_by_id Int  @map("postedByUserId")
+
+    liked_by_users User[] @relation("liked_business")
+    saved_by_users User[] @relation("saved_business")
+}
