@@ -25,7 +25,7 @@ export const user = catchAsync(
 export const editUser = catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
         const { id } = req.user!;
-        const { name, type, phone } = req.body;
+        const { name, type, phone, photo } = req.body;
 
         let data: any = {};
         if (name) {
@@ -46,24 +46,8 @@ export const editUser = catchAsync(
             }
         }
 
-        if (req.files && req.files.photo) {
-            const photo = req.files.photo as fileUpload.UploadedFile;
-
-            if (photo.mimetype.split('/')[0] != 'image') {
-                return {
-                    success: false,
-                    error: new CustomError(
-                        'Uploaded photo is not an image',
-                        400
-                    ),
-                };
-            }
-
-            const photoExtension = photo.name.split('.').pop();
-            const photoFilename = uuidv4() + '.' + photoExtension;
-            photo.mv(process.env.STORAGE_PATH + photoFilename);
-
-            data.photo = photoFilename;
+        if (photo) {
+            data.photo = photo;
         }
 
         const userPrisma = await prisma.user.update({

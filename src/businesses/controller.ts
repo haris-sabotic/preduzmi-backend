@@ -11,9 +11,9 @@ import { BusinessModelLegalTypes, BusinessModelTypes, businessModelFromPrisma, l
 export const createBusiness = catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
         const userId = (req.user!).id;
-        const { name, type, legalType, description } = req.body;
+        const { name, type, legalType, description, photo } = req.body;
 
-        if (!name || !type || !legalType || !description || !(req.files && req.files.photo)) {
+        if (!name || !type || !legalType || !description || !photo) {
             return next(
                 new CustomError('Please provide name, type, legalType, description and photo', 400)
             );
@@ -32,29 +32,13 @@ export const createBusiness = catchAsync(
         }
 
 
-        const photo = req.files.photo as fileUpload.UploadedFile;
-
-        if (photo.mimetype.split('/')[0] != 'image') {
-            return {
-                success: false,
-                error: new CustomError(
-                    'Uploaded photo is not an image',
-                    400
-                ),
-            };
-        }
-
-        const photoExtension = photo.name.split('.').pop();
-        const photoFilename = uuidv4() + '.' + photoExtension;
-        photo.mv(process.env.STORAGE_PATH + photoFilename);
-
         const businessPrisma = await prisma.business.create({
             data: {
                 name,
                 type: typeToPrisma(type),
                 legal_type: legalTypeToPrisma(legalType),
                 description,
-                photo: photoFilename,
+                photo,
                 posted_by_id: userId
             }
         });
@@ -68,7 +52,7 @@ export const editBusiness = catchAsync(
     async (req: Request, res: Response, next: NextFunction) => {
         const userId = (req.user!).id;
         const businessId = req.params.id;
-        const { name, type, legalType, description } = req.body;
+        const { name, type, legalType, description, photo } = req.body;
 
         const business = await prisma.business.findUnique({
             where: {
@@ -119,27 +103,10 @@ export const editBusiness = catchAsync(
             data.legal_type = legalTypeToPrisma(legalType);
         }
 
-        if (req.files && req.files.photo) {
-            const photo = req.files.photo as fileUpload.UploadedFile;
-
-            if (photo.mimetype.split('/')[0] != 'image') {
-                return {
-                    success: false,
-                    error: new CustomError(
-                        'Uploaded photo is not an image',
-                        400
-                    ),
-                };
-            }
-
-            const photoExtension = photo.name.split('.').pop();
-            const photoFilename = uuidv4() + '.' + photoExtension;
-            photo.mv(process.env.STORAGE_PATH + photoFilename);
-
-            data.photo = photoFilename;
+        if (photo) {
+            data.photo = photo;
         }
 
-        console.log(data);
         const businessPrisma = await prisma.business.update({
             where: { id: parseInt(businessId) },
             data
