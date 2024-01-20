@@ -19,4 +19,9 @@ app.listen(process.env.APP_PORT, () => {
     console.log(`Listening on port ${process.env.APP_PORT}`);
 });
 
+app.get('/storage/:name', function (req: any, res: any) {
+  const filePath = path.join(__dirname, process.env.STORAGE_PATH + req.params.name);
+  res.sendFile(filePath);
+});
+
 app.use(errorHandlerMiddleware);
