@@ -23,6 +23,6 @@ router
 
 router
     .route('/all')
-    .get(authMiddleware, businessController.allBusinesses);
+    .post(authMiddleware, businessController.allBusinesses);
 
 export default router;
