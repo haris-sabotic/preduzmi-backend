@@ -21,7 +21,7 @@ app.listen(process.env.APP_PORT, () => {
 });
 
 app.get('/storage/:name', function (req: any, res: any) {
-  const filePath = path.join(__dirname, process.env.STORAGE_PATH + req.params.name);
+  const filePath = path.join(__dirname, '..', process.env.STORAGE_PATH + req.params.name);
   res.sendFile(filePath);
 });
 
