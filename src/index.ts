@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 import { configureFileUpload } from "./util/configureFileUpload";
 import errorHandlerMiddleware from "./middlewares/errorHandler";
 import router from "./routes";
+import path from "path";
 
 dotenv.config();
 
