@@ -29,7 +29,8 @@ const search = catchAsync(
         const usersPrisma = await prisma.user.findMany({
             where: {
                 name: {
-                    contains: query
+                    contains: query,
+                    mode: 'insensitive'
                 }
             }
         });
@@ -37,7 +38,8 @@ const search = catchAsync(
         const businessesPrisma = await prisma.business.findMany({
             where: {
                 name: {
-                    contains: query
+                    contains: query,
+                    mode: 'insensitive'
                 }
             }
         });
